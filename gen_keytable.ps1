@@ -22,9 +22,10 @@ Function RecursiveRegKey()
     {
         try {
             Add-Content $KeytablePath $Content
+            Start-Sleep -Milliseconds 1
         }
         catch {
-            Write-Out("Failed to write. File in use...")
+            Write-Output("Failed to write. File in use...")
         }
     }
 
