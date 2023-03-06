@@ -37,18 +37,29 @@ def get_max_path_len(path_data, current_path):
     return max_len
 
 def main():
-    datapoints = open("datapoints.txt", "w")
+    datapoints = open("hkcr_datapoints.txt", "a")
     path_data = []
 
-    with open("hkcu_keytable.txt") as file:
+    k = 0
+    f = open("hkcr_keytable.txt", 'r')
+    num_of_lines = len(f.readlines())
+    f.close()
+
+    with open("hkcr_keytable.txt") as file:
         for line in file:
+            a = 100 * (k/num_of_lines)
+            print(f'{a:.2f}', end='\r', flush=True)
             path_info = line.split("|")
             path = path_info[0]
             children = path_info[1]
             path_data.append([path, children])
+            k += 1
 
+    print('')
     data_points = []
     for i in range(len(path_data)):
+        a = 100 * (i/len(path_data))
+        print(f'{a:.2f}', end='\r', flush=True)
         current_path = path_data[i][0]
         pp = get_parent_path(current_path)
         sib_info = get_sibling_info(path_data, current_path, pp)
