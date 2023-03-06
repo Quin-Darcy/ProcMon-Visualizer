@@ -5,18 +5,15 @@ let reg_data = [];
 let log_data = [];
 let iter = 1;
 
-let hkcu_base = [W/2, H/2];
-
 function preload() {
-  reg_data = loadStrings('datapoints.txt');
-  log_data = loadStrings('parsed_log.txt');
+  reg_data = loadStrings('hk_datapoints.txt');
+  log_data = loadStrings('word_open_procmon.txt');
 }
 
 function setup() {
   createCanvas(W, H);
   background(0);
   create_hashmap();
-  console.log(reg_map.get("HKEY_CURRENT_USER\\Software\\Classes"));
 }
 
 function create_hashmap() {
@@ -29,70 +26,34 @@ function create_hashmap() {
   }
 }
 
-function get_subpaths(path) {
-  let subpaths = [];
-  let nodes = path.split("\\");
-  nodes[0] = "HKEY_CURRENT_USER";
-
-  for (let i = 0; i < nodes.length; i++) {
-    let tmp = "";
-    for (let j = 0; j < i+1; j++) {
-      if (j == 0) {
-        tmp = tmp.concat(nodes[j]);
-      } else {
-        tmp = tmp.concat("\\");
-        tmp = tmp.concat(nodes[j]);
-      }
-    }
-    if (tmp.slice(-1) == '"') {
-      tmp = tmp.substring(0, tmp.length-1);
-    }
-    subpaths.push(tmp);
-  }
-  return subpaths;
-}
-
-function get_points(subpaths) {
-  let points = [];
-  let max_d = Math.sqrt(W*W + H*H);
-
-  if (subpaths[0] == "HKEY_CURRENT_USER") {
-    points[0] = hkcu_base;
-  }
-  for (let i = 1; i < subpaths.length; i++) {
-    let vals = reg_map.get(subpaths[i]);
-
-    if (vals === undefined) {
-      console.log(subpaths[i]);
-      break;
-    }
-
-    let d = max_d/(2*vals[2]);
-    let angles = Math.PI / vals[1];
-    let theta = vals[0] * angles;
-
-    let x = points[i-1][0] + d*Math.cos(theta);
-    let y = points[i-1][1] + d*Math.sin(theta);
-
-    points.push([x, y]);
-  }
-  return points;
-}
-
 function draw() {
   background(0);
+  //frameRate(2);
+  let complete = round((iter / log_data.length) * 100, 2);
+  textSize(32);
+  text(str(complete)+'%', 10, 30);
   if (iter % log_data.length != 0) {
-    let key_path = log_data[iter].split(";")[2];
+    let b;
+    let key_path = log_data[iter].split(";")[1];
     let root = key_path.split("\\")[0];
-    if (root == '"HKCU' || root == '"HKCU"') {
-      let subpaths = get_subpaths(key_path);
-      let points = get_points(subpaths);
 
-      stroke(255);
-      for (let i = 0; i < points.length-1; i++) {
-        line(points[i][0], points[i][1], points[i+1][0], points[i+1][1]);
-      }
+    if (root == '"HKCU' || root == '"HKCU"') {
+      //b = new Branch(key_path, 0, 0);
+      b = new Grid(key_path, 0);
+    } else if (root == '"HKLM' || root == '"HKLM"') {
+      //b = new Branch(key_path, 2*PI/3, 1);
+      b = new Grid(key_path, 1);
+    } else if (root == '"HKCR' || root == '"HKCR"'){
+      //b = new Branch(key_path, PI, 2);
+      b = new Grid(key_path, 2);
     }
+
+    if (b == undefined) {
+      let x = 1;
+    } else {
+      b.show();
+    }
+  
     iter += 1;
   }
   iter = (iter+1)%log_data.length+1;
