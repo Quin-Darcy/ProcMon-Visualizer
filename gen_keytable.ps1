@@ -74,6 +74,7 @@ Function RecursiveRegKey()
         $KeyName = $KeyName + "|" + (GetChildren($Key))
 
         WriteToTable($KeyName)
+        #Write-Output("Writing ", $KeyName)
 
         # If the current key has subkeys, we recurse through them
         if($Key.SubKeyCount -gt 0)
@@ -89,4 +90,4 @@ Function RecursiveRegKey()
     Burrow -Key $Hive
 }
 
-RecursiveRegKey -ComputerName $(hostname) -HiveName "LocalMachine" -KeytablePath "C:\Users\Administrator\Documents\Projects\Data Visuals\gen_keytable\keytables\hklm_keytable.txt"
+RecursiveRegKey -ComputerName $(hostname) -HiveName "ClassesRoot" -KeytablePath "C:\Users\Administrator\Documents\Projects\Data Visuals\gen_keytable\keytables\hkcr_keytable.txt"
